@@ -19,6 +19,11 @@ function loadTasks() {
   }
 }
 
+function updateStorage() {
+  const items = getTasksFromDOM();
+  saveTasks(items);
+}
+
 function createItem(item) {
   const template = document.getElementById("to-do__item-template");
   const clone = template.content.querySelector(".to-do__item").cloneNode(true);
@@ -31,16 +36,14 @@ function createItem(item) {
 
   deleteButton.addEventListener("click", () => {
     clone.remove();
-    const items = getTasksFromDOM();
-    saveTasks(items);
+    updateStorage();
   });
 
   duplicateButton.addEventListener("click", () => {
     const itemName = textElement.textContent;
     const newItem = createItem(itemName);
     listElement.prepend(newItem);
-    const items = getTasksFromDOM();
-    saveTasks(items);
+    updateStorage();
   });
 
   editButton.addEventListener("click", () => {
@@ -50,8 +53,7 @@ function createItem(item) {
 
   textElement.addEventListener("blur", () => {
     textElement.setAttribute("contenteditable", "false");
-    const items = getTasksFromDOM();
-    saveTasks(items);
+    updateStorage();
   });
 
   textElement.textContent = item;
@@ -82,13 +84,16 @@ items.forEach((item) => {
 formElement.addEventListener("submit", (evt) => {
   evt.preventDefault();
 
-  const taskText = inputElement.value;
+  const taskText = inputElement.value.trim();
+
+  if (taskText === "") {
+    return;
+  }
 
   const clone = createItem(taskText);
   listElement.prepend(clone);
 
-  items = getTasksFromDOM();
-  saveTasks(items);
+  updateStorage();
 
   inputElement.value = "";
 });
